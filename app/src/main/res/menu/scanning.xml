@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item android:id="@+id/scanning_start" android:title="@string/title_scan" android:orderInCategory="3" app:showAsAction="ifRoom|withText" />
+    <item android:id="@+id/scanning_stop" android:title="@string/title_stop" android:orderInCategory="4" app:showAsAction="ifRoom|withText" />
+    <item android:id="@+id/scanning_indicator" android:title="" android:orderInCategory="2" app:showAsAction="ifRoom" />
+    <item android:id="@+id/show_log_item" android:title="@string/title_log" app:showAsAction="always|withText" android:orderInCategory="6" />
+
+</menu>
+

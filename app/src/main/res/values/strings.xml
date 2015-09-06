@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Akamia</string>
+
+    <string name="no_sensors_stored">You have 0 beacons active.</string>
+
+    <string name="far">Far</string>
+    <string name="near">Near</string>
+    <string name="close">At beacon</string>
+
+    <string name="title_scan">Scan</string>
+    <string name="title_stop">Stop</string>
+    <string name="title_log">Log</string>
+
+</resources>

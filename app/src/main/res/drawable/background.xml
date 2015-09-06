@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:drawable="@drawable/background_image"/>
+    <item android:bottom="@dimen/navigation_bar_height"
+        android:right="@dimen/navigation_bar_width">
+        <bitmap
+            android:gravity="bottom|center_horizontal"
+            android:src="@drawable/background_title" />
+    </item>
+
+</layer-list>
