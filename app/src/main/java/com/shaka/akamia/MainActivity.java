@@ -29,7 +29,7 @@ public class MainActivity extends SingleFragmentActivity
 
     // callback to MainActivityFragment
     public void onDeviceSelected(BluetoothDevice device, String sid) {
-        Toast.makeText(this, "Select function has not published yet.", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Ready to go", Toast.LENGTH_LONG).show();
 
         //You can start an instance of BeaconDetailActivity here
 
