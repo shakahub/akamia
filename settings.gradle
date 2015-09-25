@@ -1,1 +1,1 @@
-include ':app', ':beaconlibrary-1.0'
+include ':app', ':beaconlibrary-1.0', ':weekview-1.0'

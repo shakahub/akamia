@@ -10,9 +10,10 @@
 package com.shaka.akamia;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.widget.Toast;
+//import android.widget.Toast;
 
 
 public class MainActivity extends SingleFragmentActivity
@@ -28,13 +29,13 @@ public class MainActivity extends SingleFragmentActivity
     }
 
     // callback to MainActivityFragment
-    public void onDeviceSelected(BluetoothDevice device, String sid) {
-        Toast.makeText(this, "Ready to go", Toast.LENGTH_LONG).show();
+    public void onDeviceSelected(BluetoothDevice device, String name) {
+        //Toast.makeText(this, "User selected one found meeting room", Toast.LENGTH_LONG).show();
 
-        //You can start an instance of BeaconDetailActivity here
-
-        //Intent i = new Intent(this. BeaconDetailActivity.class);
-        //i.putExtra(BeaconDetailFragment.EXTRA_DEVICE_ADDRESS, device.getAddress());
-        //startActivity(i);
+        //You can start an instance of RoomDetailActivity here
+        Intent i = new Intent(this, RoomFreeBusyActivity.class);
+        i.putExtra(RoomFreeBusyActivity.EXTRA_DEVICE_ADDRESS, device.getAddress());
+        i.putExtra(RoomFreeBusyActivity.EXTRA_DEVICE_NAME, name);
+        startActivity(i);
     }
 }

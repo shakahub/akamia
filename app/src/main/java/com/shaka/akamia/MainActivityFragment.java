@@ -36,7 +36,7 @@ import java.util.Map;
 public class MainActivityFragment extends ListFragment {
 
     private static final long SCANNING_TIMEOUT = 30 * 1000; /* 30 seconds */
-    private static final long MONITOR_DELAY_TIME_INTERVAL = 5000; /* 5 seconds */
+    private static final long MONITOR_DELAY_TIME_INTERVAL = 15000; /* 15 seconds */
     private static final int ENABLE_BT_REQUEST_ID = 1;
 
     private static final int UNREGISTERED = -1;
@@ -51,7 +51,7 @@ public class MainActivityFragment extends ListFragment {
     private boolean mScanning = false;
 
     public interface Callbacks {
-        void onDeviceSelected(BluetoothDevice device, String deviceId);
+        void onDeviceSelected(BluetoothDevice device, String name);
     }
 
     @Override
@@ -261,9 +261,9 @@ public class MainActivityFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         BluetoothDevice device = mBeaconListAdapter.getDevice(position);
-        String regid = mBeaconListAdapter.getRegId(position);
+        String name = mBeaconListAdapter.getName(position);
 
-        mCallbacks.onDeviceSelected(device, regid);
+        mCallbacks.onDeviceSelected(device, name);
     }
 
     /* check if user agreed to enable BT */

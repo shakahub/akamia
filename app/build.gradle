@@ -21,7 +21,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/json-simple-1.1.1.jar')
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile project(':beaconlibrary-1.0')
-    compile files('libs/json-simple-1.1.1.jar')
+    compile project(':weekview-1.0')
 }

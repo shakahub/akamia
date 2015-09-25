@@ -21,11 +21,14 @@ import android.util.Log;
 import android.net.Uri;
 
 import org.apache.http.HttpStatus;
+import org.json.JSONObject;
 
 
 public class BeaconFetchr {
     public static final String TAG = "BeaconFetcher";
     private static final String ENDPOINT = "http://52.25.76.65:8080/beacons/";
+    private static final String CALENDAREVENTS_FREE_BUSY = "calendar-events/free-busy";
+    private static final String CALENDAR_EVENTS = "calendar-events";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
@@ -81,5 +84,35 @@ public class BeaconFetchr {
         }
 
         return map;
+    }
+
+    public String fetchRoomFreeBusyInfo(String address) {
+        String data = null;
+
+        try {
+            String url = Uri.parse(ENDPOINT).buildUpon().appendEncodedPath(address).
+                    appendEncodedPath(CALENDAREVENTS_FREE_BUSY).build().toString();
+            data = getUrl(url);
+
+        } catch (IOException ioe) {
+            Log.e(TAG, "Failed to fetch meeting room free or busy information.", ioe);
+        }
+
+        return data;
+    }
+
+    public String fetchRoomEvents(String address) {
+        String data = null;
+
+        try {
+            String url = Uri.parse(ENDPOINT).buildUpon().appendEncodedPath(address).
+                    appendEncodedPath(CALENDAR_EVENTS).build().toString();
+            data = getUrl(url);
+
+        } catch (IOException ioe) {
+            Log.e(TAG, "Failed to fetch meeting room events.", ioe);
+        }
+
+        return data;
     }
 }

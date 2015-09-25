@@ -35,7 +35,6 @@ public class BeaconListAdapter extends BaseAdapter {
 
     private ArrayList<BluetoothDevice> mUnregDevices;
     private ArrayList<BluetoothDevice> mDevices;
-    private ArrayList<String> mDevicesId;
     private ArrayList<String> mDevicesName;
     private ArrayList<Integer> mRSSIs;
     private ArrayList<String> mRecord;
@@ -45,7 +44,6 @@ public class BeaconListAdapter extends BaseAdapter {
     public BeaconListAdapter(Activity par) {
         mUnregDevices = new ArrayList<>();
         mDevices = new ArrayList<>();
-        mDevicesId = new ArrayList<>();
         mDevicesName = new ArrayList<>();
         mRSSIs = new ArrayList<>();
         mRecord = new ArrayList<>();
@@ -54,30 +52,38 @@ public class BeaconListAdapter extends BaseAdapter {
 
     public void addOrUpdateDevice(BluetoothDevice device, int rssi, Map map, Boolean isNewFound) {
         if (isNewFound) {
+            //whatever the device is registered or not, first put it into un-registered device list
+            if (!mUnregDevices.contains(device))
+                mUnregDevices.add(device);
+
             if (map == null || map.size() <= 0) {
-                //unregistered device
-                if (!mUnregDevices.contains(device))
-                    mUnregDevices.add(device);
+                //do nothing;
             } else {
                 //Parse device information fetched from server
                 MapUtil mu = new MapUtil(map);
-                String sid = mu.getValueByKey("id").toString();
                 String name = mu.getValueByKey("name").toString();
                 String beaconSubjectType = mu.getValueByKey("beaconSubjectType").toString();
                 String location = mu.getValueByKey("location").toString();
 
+                Map map2 = new ParseToMap().parse2(location);
+                MapUtil mu2 = new MapUtil(map2);
 
                 String info = "Type: " + beaconSubjectType + "\n" +
-                        "Located at: " + location;
+                        "City: " + mu2.getValueByKey("city").toString();
 
-                //Add this device into the list
-                mDevices.add(device);
-                mDevicesId.add(sid);
-                mDevicesName.add(name);
-                mRSSIs.add(rssi);
-                mRecord.add(info);
+                //remove it from unregistered device list
+                if (mUnregDevices.contains(device))
+                    mUnregDevices.remove(device);
 
-                notifyDataSetChanged();
+                if (! mDevices.contains(device)) {
+                    //Add this device into the list
+                    mDevices.add(device);
+                    mDevicesName.add(name);
+                    mRSSIs.add(rssi);
+                    mRecord.add(info);
+
+                    notifyDataSetChanged();
+                }
             }
         } else {
             updateDevice(device, rssi);
@@ -95,6 +101,8 @@ public class BeaconListAdapter extends BaseAdapter {
     public BluetoothDevice getDevice(int index) {
         return mDevices.get(index);
     }
+
+    public String getName(int index) { return mDevicesName.get(index); }
 
     /**
      * get device's name from Complete Local Name or Shortened Local Name field
@@ -139,7 +147,6 @@ public class BeaconListAdapter extends BaseAdapter {
 
     public void removeDevice(int index) {
         mDevices.remove(index);
-        mDevicesId.remove(index);
         mDevicesName.remove(index);
         mRSSIs.remove(index);
         mRecord.remove(index);
@@ -152,8 +159,6 @@ public class BeaconListAdapter extends BaseAdapter {
             mUnregDevices.clear();
         if (mDevices.size() !=0)
             mDevices.clear();
-        if (mDevicesId.size() != 0)
-            mDevicesId.clear();
         if (mDevicesName.size() != 0)
             mDevicesName.clear();
         if (mRSSIs.size() != 0)
@@ -178,8 +183,6 @@ public class BeaconListAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
-
-    public String getRegId(int position) { return mDevicesId.get(position); }
 
 
     public int getRegStatus(BluetoothDevice device) {
@@ -214,10 +217,9 @@ public class BeaconListAdapter extends BaseAdapter {
         int rssi = mRSSIs.get(position);
         String info = mRecord.get(position);
         String name = mDevicesName.get(position);
-        String address = mDevicesId.get(position);
 
         fields.deviceName.setText(name);
-        fields.deviceAddress.setText(address);
+        fields.deviceAddress.setText(device.getAddress());
         fields.deviceRecord.setText(info);
         fields.deviceRssi.setText("RSSI: " + Integer.toString(rssi));
         if (rssi * (-1) > 100 )
