@@ -11,7 +11,8 @@ package com.shaka.akamia;
 
 import android.support.v4.app.Fragment;
 
-public class RoomFreeBusyActivity extends SingleFragmentActivity {
+public class RoomFreeBusyActivity extends SingleFragmentActivity
+        implements RoomFreeBusyFragment.Callbacks {
     public static final String EXTRA_DEVICE_ADDRESS = "meetingroom.beacon_address";
     public static final String EXTRA_DEVICE_NAME = "meetingroom.name";
 

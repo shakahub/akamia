@@ -1,7 +1,9 @@
 package com.shaka.akamia;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by JH on 9/22/15.
@@ -85,4 +87,49 @@ public class CalendarEvent {
     Calendar startDateTime;
     Calendar endDateTime;
     ArrayList<Attendee> attendees;
+
+    public String getTimeTitle() {
+        Calendar st = this.getStartDateTime();
+        Calendar et = this.getEndDateTime();
+
+        SimpleDateFormat weekdayNameFormat= new SimpleDateFormat("EEE", Locale.getDefault());
+        String weekday = weekdayNameFormat.format(st.getTime());
+
+        return String.format("%s, %s %02d, %02d:%02d%s - %02d:%02d%s",
+                weekday, st.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US),
+                st.get(Calendar.DAY_OF_MONTH), st.get(Calendar.HOUR_OF_DAY), st.get(Calendar.MINUTE),
+                st.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm", et.get(Calendar.HOUR_OF_DAY),
+                et.get(Calendar.MINUTE), et.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm");
+    }
+
+    public String getAttendeesShortString() {
+        int i = 0, j = 0;
+        StringBuilder sb = new StringBuilder("");
+
+        for(Attendee att : this.attendees) {
+            if (i >= 5)
+                break;
+
+            if (att.getDisplayName() != null) {
+                sb.insert(0, att.getDisplayName() + ", ");
+                i++;
+            } else {
+                if (att.getEmail() != null) {
+                    if (j == 0) {
+                        sb.append(att.getEmail());
+                        j++;
+                    } else
+                        sb.append(", " + att.getEmail());
+                    i++;
+                }
+            }
+        }
+
+        j = this.attendees.size() - i;
+
+        if ( j != 0)
+            sb.append(" + " + Integer.toString(j));
+
+        return sb.toString();
+    }
 }

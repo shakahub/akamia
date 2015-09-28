@@ -10,6 +10,7 @@
 package com.shaka.akamia;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.shaka.weekview.DateTimeInterpreter;
@@ -33,16 +36,16 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChangeListener,
-        WeekView.EventClickListener, WeekView.EventLongPressListener {
+        WeekView.EventClickListener {
 
     private static final String ARG_PARAM1 = "mac_address";
     private static final String ARG_PARAM2 = "room_name";
 
     private String mParam1;
     private String mParam2;
+    private String mRoomName;
     private ArrayList<String> mArrayList;
     private ArrayList<CalendarEvent> mCalendarEventList;
 
@@ -52,7 +55,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
     private WeekView mWeekView;
 
-    Callbacks callbacks;
+    Callbacks mCallbacks;
 
 
     public interface Callbacks {
@@ -112,9 +115,6 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
         // The week view has infinite scrolling horizontally. We have to provide the events of a
         // month every time the month changes on the week view.
         mWeekView.setMonthChangeListener(this);
-
-        // Set long press listener for events.
-        mWeekView.setEventLongPressListener(this);
 
         setupDateTimeInterpreter(false);
 
@@ -193,11 +193,13 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mCallbacks = (Callbacks)activity;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mCallbacks = null;
     }
 
     @Override
@@ -289,7 +291,8 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                 ArrayList<Attendee> attendees = ce.getAttendees();
                 for(Attendee att : attendees) {
                     if (att.getDisplayName() != null) {
-                        getActivity().setTitle(mParam2 + " - " + att.getDisplayName());
+                        mRoomName = att.getDisplayName();
+                        getActivity().setTitle(mParam2 + " - " + mRoomName);
                         break;
                     }
                 }
@@ -375,12 +378,38 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(getActivity(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
-    }
+        for(CalendarEvent ce : mCalendarEventList) {
 
-    @Override
-    public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(getActivity(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
-    }
+            if (Long.parseLong(ce.getEvent_id()) == event.getId()) {
+                final Dialog dialog = new Dialog(getActivity());
 
+                View v = getActivity().getLayoutInflater().inflate(R.layout.event_dialog, null);
+
+                dialog.setContentView(v);
+                dialog.setTitle(ce.getSummary());
+
+                TextView textView1 = (TextView)dialog.findViewById(R.id.title);
+                textView1.setText(ce.getTimeTitle());
+
+                TextView textView2 = (TextView)dialog.findViewById(R.id.where_text);
+                textView2.setText(mRoomName);
+
+                TextView textView3 = (TextView)dialog.findViewById(R.id.who_text);
+
+                textView3.setText(ce.getAttendeesShortString());
+
+                Button dialogButton = (Button)dialog.findViewById(R.id.dialogButtonOK);
+
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+                break;
+            }
+        }
+    }
 }
