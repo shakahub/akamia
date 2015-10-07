@@ -9,8 +9,6 @@
  */
 package com.shaka.akamia.objects;
 
-import com.shaka.akamia.objects.Attendee;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,7 +17,6 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class CalendarEvent {
-
 
     public CalendarEvent() {
     }

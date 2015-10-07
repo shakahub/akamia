@@ -19,8 +19,6 @@ import java.util.Map;
 import android.util.Log;
 import android.net.Uri;
 
-import com.shaka.akamia.util.ParseToMap;
-
 public class BeaconFetcher {
     public static final String TAG = "BeaconFetcher";
     private static final String ENDPOINT = "http://52.26.217.219:8080/beacons/";
