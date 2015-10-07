@@ -14,7 +14,6 @@ import com.shaka.akamia.objects.CalendarEvent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -35,13 +34,21 @@ public class MapUtil {
     public MapUtil(Map src) {
         init();
 
+        for(Object o : src.entrySet()) {
+            Map.Entry entry = (Map.Entry)o;
+            arrayList.add(entry);
+        }
 
+        /*
+        //same as above but just use Iterator. Compiler will give a warning message for this
+        //since while can be replaced by foreach.
         Iterator iter = src.entrySet().iterator();
 
         while(iter.hasNext()) {
             Map.Entry entry = (Map.Entry)iter.next();
             arrayList.add(entry);
         }
+        */
     }
 
     private void init() {
@@ -54,33 +61,30 @@ public class MapUtil {
 
     public ArrayList<String> convertToFreeBusyList(Map src) {
 
-        Iterator iter = src.entrySet().iterator();
-
-        while(iter.hasNext()) {
-            Map.Entry entry = (Map.Entry)iter.next();
+        for(Object obj : src.entrySet()) {
+            Map.Entry entry = (Map.Entry)obj;
             String key = entry.getKey().toString();
             if (key.equals("busy")) {
                 LinkedList ll = (LinkedList) entry.getValue();
                 int times = ll.size();
                 for (int i = 0; i < times; i++) {
                     Map map = (Map) ll.get(i);
-                    iter = map.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        entry = (Map.Entry) iter.next();
+                    for (Object o : map.entrySet()) {
+                        entry = (Map.Entry)o;
                         key = entry.getKey().toString();
 
                         if (key.equals("end")) {
                             LinkedHashMap lh = (LinkedHashMap) entry.getValue();
-                            Iterator iter2 = lh.entrySet().iterator();
 
-                            while (iter2.hasNext()) {
-                                Map.Entry entry2 = (Map.Entry) iter2.next();
+                            for(Object o2 : lh.entrySet()) {
+                                Map.Entry entry2 = (Map.Entry)o2;
                                 if (entry2.getKey().equals("value")) {
                                     lend = (long) entry2.getValue();
                                 }
+                                /*
                                 if (entry2.getKey().equals("dateOnly")) {
                                     //do nothing
-                                }
+                                } */
                                 if (entry2.getKey().equals("timeZoneShift")) {
                                     lend = lend + (long) entry2.getValue() * 3600000;
                                 }
@@ -88,16 +92,16 @@ public class MapUtil {
                         }
                         if (key.equals("start")) {
                             LinkedHashMap lh = (LinkedHashMap) entry.getValue();
-                            Iterator iter2 = lh.entrySet().iterator();
 
-                            while (iter2.hasNext()) {
-                                Map.Entry entry2 = (Map.Entry) iter2.next();
+                            for (Object o2 : lh.entrySet()) {
+                                Map.Entry entry2 = (Map.Entry)o2;
                                 if (entry2.getKey().equals("value")) {
                                     lstart = (long) entry2.getValue();
                                 }
+                                /*
                                 if (entry2.getKey().equals("dateOnly")) {
                                     //do nothing so far
-                                }
+                                } */
                                 if (entry2.getKey().equals("timeZoneShift")) {
                                     lstart = lstart + (long) entry2.getValue() * 3600000;
                                 }
@@ -127,9 +131,9 @@ public class MapUtil {
             calendarEvent.setEvent_id(Integer.toString(i));
 
             Map map = (Map) src.get(i);
-            Iterator iter = map.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry entry = (Map.Entry) iter.next();
+
+            for (Object obj : map.entrySet()) {
+                Map.Entry entry = (Map.Entry) obj;
                 if (entry.getKey().toString().equals("summary")) {
                     calendarEvent.setSummary(entry.getValue() == null ? null : entry.getValue().toString());
                     continue;
@@ -147,9 +151,8 @@ public class MapUtil {
 
                 if (entry.getKey().toString().equals("creator")) {
                     LinkedHashMap lh = (LinkedHashMap) entry.getValue();
-                    Iterator iter2 = lh.entrySet().iterator();
-                    while (iter2.hasNext()) {
-                        Map.Entry entry2 = (Map.Entry) iter2.next();
+                    for (Object o : lh.entrySet()) {
+                        Map.Entry entry2 = (Map.Entry)o;
                         if (entry2.getKey().equals("email")) {
                             calendarEvent.setCreator(entry.getValue() == null ? null : entry.getValue().toString());
                             break;
@@ -161,14 +164,13 @@ public class MapUtil {
                 if (entry.getKey().toString().equals("startDateTime")) {
                     //Save local timezone
                     TimeZone tz = TimeZone.getDefault();
-                    //Set current timzezone to UTC because the time from server is in UTC timezone
+                    //Set current timezone to UTC because the time from server is in UTC timezone
                     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
                     Calendar startDate = Calendar.getInstance();
                     LinkedHashMap lh = (LinkedHashMap) entry.getValue();
-                    Iterator iter2 = lh.entrySet().iterator();
 
-                    while(iter2.hasNext()) {
-                        Map.Entry entry2 = (Map.Entry) iter2.next();
+                    for(Object o : lh.entrySet()) {
+                        Map.Entry entry2 = (Map.Entry)o;
                         if (entry2.getKey().equals("year")) {
                             startDate.set(Calendar.YEAR, Integer.parseInt(entry2.getValue().toString()));
                             continue;
@@ -213,14 +215,13 @@ public class MapUtil {
                 if (entry.getKey().toString().equals("endDateTime")) {
                     //Save local timezone
                     TimeZone tz = TimeZone.getDefault();
-                    //Set current timzezone to UTC because the time from server is in UTC timezone
+                    //Set current timezone to UTC because the time from server is in UTC timezone
                     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
                     Calendar endDate = Calendar.getInstance();
                     LinkedHashMap lh = (LinkedHashMap) entry.getValue();
-                    Iterator iter2 = lh.entrySet().iterator();
 
-                    while (iter2.hasNext()) {
-                        Map.Entry entry2 = (Map.Entry) iter2.next();
+                    for (Object o : lh.entrySet()) {
+                        Map.Entry entry2 = (Map.Entry)o;
                         if (entry2.getKey().equals("year")) {
                             endDate.set(Calendar.YEAR, Integer.parseInt(entry2.getValue().toString()));
                             continue;
@@ -271,9 +272,9 @@ public class MapUtil {
                     for(int j=0; j < list.size(); j++) {
                         Attendee attendee = new Attendee();
                         Map map2 = (Map)list.get(j);
-                        Iterator iter3 = map2.entrySet().iterator();
-                        while (iter3.hasNext()) {
-                            Map.Entry entry3 = (Map.Entry) iter3.next();
+
+                        for (Object o : map2.entrySet()) {
+                            Map.Entry entry3 = (Map.Entry)o;
                             if (entry3.getKey().equals("displayName")) {
                                 attendee.setDisplayName(entry3.getValue() == null ? null : entry3.getValue().toString());
                                 continue;
@@ -320,7 +321,9 @@ public class MapUtil {
         return list;
     }
 
-    public ArrayList<CalendarEvent> getCalendarEventList() { return eventList; }
+    public ArrayList<CalendarEvent> getCalendarEventList() {
+        return eventList;
+    }
 
     public Object getValueByKey(String key) {
         for (Map.Entry entry : arrayList) {

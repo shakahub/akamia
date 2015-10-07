@@ -28,7 +28,7 @@
             android:name=".RoomFreeBusyActivity"
             android:label="@string/detail_name" />
         <activity
-            android:name=".bookEventActivity"
+            android:name=".BookEventActivity"
             android:label="@string/title_activity_book_event" >
         </activity>
     </application>
