@@ -22,6 +22,9 @@ import android.widget.BaseAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.shaka.akamia.util.MapUtil;
+import com.shaka.akamia.util.ParseToMap;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Map;

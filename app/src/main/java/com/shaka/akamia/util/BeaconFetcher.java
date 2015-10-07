@@ -7,7 +7,7 @@
  * Created by:  John Hou
  * Created on:  9/2/2015
  */
-package com.shaka.akamia;
+package com.shaka.akamia.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,6 +18,8 @@ import java.util.Map;
 
 import android.util.Log;
 import android.net.Uri;
+
+import com.shaka.akamia.util.ParseToMap;
 
 public class BeaconFetcher {
     public static final String TAG = "BeaconFetcher";

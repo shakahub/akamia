@@ -29,12 +29,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.shaka.akamia.objects.CalendarEvent;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class bookEventActivity extends AppCompatActivity {
+public class BookEventActivity extends AppCompatActivity {
     public static final String EXTRA_START_TIME = "startTime";
     public static final String EXTRA_DEVICE_ADDRESS = "macAddress";
     public static final String EXTRA_ROOM_NAME = "meetingRoomName";
@@ -113,7 +115,7 @@ public class bookEventActivity extends AppCompatActivity {
 
                     }
                 };
-                new DatePickerDialog(bookEventActivity.this, t, fCalendar.get(Calendar.YEAR),
+                new DatePickerDialog(context, t, fCalendar.get(Calendar.YEAR),
                         fCalendar.get(Calendar.MONTH), fCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
@@ -134,7 +136,7 @@ public class bookEventActivity extends AppCompatActivity {
                         mFromTimeButton.setText(from_time);
                     }
                 };
-                new TimePickerDialog(bookEventActivity.this, t,
+                new TimePickerDialog(context, t,
                         fCalendar.get(Calendar.HOUR_OF_DAY),
                         fCalendar.get(Calendar.MINUTE), true).show();
             }
@@ -176,7 +178,7 @@ public class bookEventActivity extends AppCompatActivity {
 
                     }
                 };
-                new DatePickerDialog(bookEventActivity.this, t, tCalendar.get(Calendar.YEAR),
+                new DatePickerDialog(context, t, tCalendar.get(Calendar.YEAR),
                         tCalendar.get(Calendar.MONTH), tCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
@@ -199,7 +201,7 @@ public class bookEventActivity extends AppCompatActivity {
                     }
                 };
 
-                new TimePickerDialog(bookEventActivity.this, t, tCalendar.get(Calendar.HOUR_OF_DAY),
+                new TimePickerDialog(context, t, tCalendar.get(Calendar.HOUR_OF_DAY),
                         tCalendar.get(Calendar.MINUTE), true).show();
             }
         });

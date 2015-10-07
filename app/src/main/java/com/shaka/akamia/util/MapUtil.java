@@ -7,7 +7,10 @@
  * Created by:  John Hou
  * Created on:  9/3/2015
  */
-package com.shaka.akamia;
+package com.shaka.akamia.util;
+
+import com.shaka.akamia.objects.Attendee;
+import com.shaka.akamia.objects.CalendarEvent;
 
 import java.util.ArrayList;
 import java.util.Calendar;

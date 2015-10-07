@@ -7,7 +7,7 @@
  * Created by:  John Hou
  * Created on:  9/22/2015
  */
-package com.shaka.akamia;
+package com.shaka.akamia.objects;
 
 
 public class Attendee {

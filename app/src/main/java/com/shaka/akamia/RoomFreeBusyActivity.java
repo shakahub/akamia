@@ -26,11 +26,11 @@ public class RoomFreeBusyActivity extends SingleFragmentActivity
     }
 
     public void onEmptyViewLongPress(Calendar time, String macAddr, String roomName) {
-        Intent i = new Intent(this, bookEventActivity.class);
+        Intent i = new Intent(this, BookEventActivity.class);
 
-        i.putExtra(bookEventActivity.EXTRA_START_TIME, time.getTimeInMillis());
-        i.putExtra(bookEventActivity.EXTRA_DEVICE_ADDRESS, macAddr);
-        i.putExtra(bookEventActivity.EXTRA_ROOM_NAME, roomName);
+        i.putExtra(BookEventActivity.EXTRA_START_TIME, time.getTimeInMillis());
+        i.putExtra(BookEventActivity.EXTRA_DEVICE_ADDRESS, macAddr);
+        i.putExtra(BookEventActivity.EXTRA_ROOM_NAME, roomName);
 
         startActivity(i);
     }

@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.shaka.akamia.util.BeaconFetcher;
 import com.shaka.beaconlibrary.BleWrapper;
 import com.shaka.beaconlibrary.BleWrapperUiCallbacks;
 

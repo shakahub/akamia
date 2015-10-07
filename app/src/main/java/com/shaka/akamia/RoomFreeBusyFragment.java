@@ -26,6 +26,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.shaka.akamia.objects.CalendarEvent;
+import com.shaka.akamia.util.BeaconFetcher;
+import com.shaka.akamia.util.MapUtil;
+import com.shaka.akamia.util.ParseToMap;
 import com.shaka.weekview.DateTimeInterpreter;
 import com.shaka.weekview.WeekView;
 import com.shaka.weekview.WeekViewEvent;

@@ -7,7 +7,7 @@
  * Created by:  John Hou
  * Created on:  9/3/2015
  */
-package com.shaka.akamia;
+package com.shaka.akamia.util;
 
 import android.util.Log;
 
