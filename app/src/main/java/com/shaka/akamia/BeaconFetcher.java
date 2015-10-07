@@ -9,7 +9,6 @@
  */
 package com.shaka.akamia;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,13 +19,9 @@ import java.util.Map;
 import android.util.Log;
 import android.net.Uri;
 
-import org.apache.http.HttpStatus;
-import org.json.JSONObject;
-
-
-public class BeaconFetchr {
+public class BeaconFetcher {
     public static final String TAG = "BeaconFetcher";
-    private static final String ENDPOINT = "http://52.25.76.65:8080/beacons/";
+    private static final String ENDPOINT = "http://52.26.217.219:8080/beacons/";
     private static final String CALENDAREVENTS_FREE_BUSY = "calendar-events/free-busy";
     private static final String CALENDAR_EVENTS = "calendar-events";
 
@@ -35,14 +30,14 @@ public class BeaconFetchr {
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 
         try {
-            InputStream in = null;
+            InputStream in;
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 in = connection.getInputStream();
 
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-                int bytesRead = 0;
+                int bytesRead;
                 byte[] buffer = new byte[1024];
                 while ((bytesRead = in.read(buffer)) > 0) {
                     out.write(buffer, 0, bytesRead);
