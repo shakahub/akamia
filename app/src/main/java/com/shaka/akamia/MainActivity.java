@@ -13,8 +13,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-//import android.widget.Toast;
-
 
 public class MainActivity extends SingleFragmentActivity
                 implements MainActivityFragment.Callbacks {
@@ -30,8 +28,6 @@ public class MainActivity extends SingleFragmentActivity
 
     // callback to MainActivityFragment
     public void onDeviceSelected(BluetoothDevice device, String name) {
-        //Toast.makeText(this, "User selected one found meeting room", Toast.LENGTH_LONG).show();
-
         //You can start an instance of RoomDetailActivity here
         Intent i = new Intent(this, RoomFreeBusyActivity.class);
         i.putExtra(RoomFreeBusyActivity.EXTRA_DEVICE_ADDRESS, device.getAddress());

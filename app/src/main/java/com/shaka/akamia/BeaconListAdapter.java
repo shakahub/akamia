@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 //import android.os.ParcelUuid;
 //import android.text.TextUtils;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +24,10 @@ import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 public class BeaconListAdapter extends BaseAdapter {
-    private static String TAG = "BeaconListAdapter";
+    private static final String TAG = "BeaconListAdapter";
 
     private static final int SHORTENED_LOCAL_NAME = 0x08;
     private static final int COMPLETE_LOCAL_NAME = 0x09;
@@ -56,26 +55,24 @@ public class BeaconListAdapter extends BaseAdapter {
             if (!mUnregDevices.contains(device))
                 mUnregDevices.add(device);
 
-            if (map == null || map.size() <= 0) {
-                //do nothing;
-            } else {
-                //Parse device information fetched from server
-                MapUtil mu = new MapUtil(map);
-                String name = mu.getValueByKey("name").toString();
-                String beaconSubjectType = mu.getValueByKey("beaconSubjectType").toString();
-                String location = mu.getValueByKey("location").toString();
+            if (map != null && map.size() > 0) {
+                if (! mDevices.contains(device)) {
+                    //Parse device information fetched from server
+                    MapUtil mu = new MapUtil(map);
+                    String name = mu.getValueByKey("name").toString();
+                    String beaconSubjectType = mu.getValueByKey("beaconSubjectType").toString();
+                    String location = mu.getValueByKey("location").toString();
 
-                Map map2 = new ParseToMap().parse2(location);
-                MapUtil mu2 = new MapUtil(map2);
+                    Map map2 = new ParseToMap().parse2(location);
+                    MapUtil mu2 = new MapUtil(map2);
 
-                String info = "Type: " + beaconSubjectType + "\n" +
+                    String info = "Type: " + beaconSubjectType + "\n" +
                         "City: " + mu2.getValueByKey("city").toString();
 
-                //remove it from unregistered device list
-                if (mUnregDevices.contains(device))
-                    mUnregDevices.remove(device);
+                    //remove it from unregistered device list
+                    if (mUnregDevices.contains(device))
+                        mUnregDevices.remove(device);
 
-                if (! mDevices.contains(device)) {
                     //Add this device into the list
                     mDevices.add(device);
                     mDevicesName.add(name);
@@ -130,9 +127,11 @@ public class BeaconListAdapter extends BaseAdapter {
         return name;
     }
 
+
     /**
      * Decodes the local name
      */
+    @Nullable
     public static String decodeLocalName(final byte[] data, final int start, final int length) {
         try {
             return new String(data, start, length, "UTF-8");
@@ -200,7 +199,7 @@ public class BeaconListAdapter extends BaseAdapter {
         // get already available view or create new if necessary
         FieldReferences fields;
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.fragment_beacon_item, null);
+            convertView = mInflater.inflate(R.layout.fragment_beacon_item, parent, false);
             fields = new FieldReferences();
             fields.deviceAddress = (TextView)convertView.findViewById(R.id.btAddress);
             fields.deviceName    = (TextView)convertView.findViewById(R.id.btName);
@@ -221,7 +220,8 @@ public class BeaconListAdapter extends BaseAdapter {
         fields.deviceName.setText(name);
         fields.deviceAddress.setText(device.getAddress());
         fields.deviceRecord.setText(info);
-        fields.deviceRssi.setText("RSSI: " + Integer.toString(rssi));
+        fields.deviceRssi.setText(String.format("%s %d",
+                parent.getContext().getString(R.string.rssi), rssi));
         if (rssi * (-1) > 100 )
             fields.progressBar.setProgress(0);
         else

@@ -2,7 +2,7 @@
  * Copyright (c) 2015, Shaka LLC
  * All rights reserved.
  *
- * Program:     BeaconFetchr
+ * Program:     BeaconFetcher
  * Purpose:     call rest webservice to check if the found beacon is a registered device
  * Created by:  John Hou
  * Created on:  9/2/2015
@@ -22,7 +22,7 @@ import android.net.Uri;
 public class BeaconFetcher {
     public static final String TAG = "BeaconFetcher";
     private static final String ENDPOINT = "http://52.26.217.219:8080/beacons/";
-    private static final String CALENDAREVENTS_FREE_BUSY = "calendar-events/free-busy";
+    //private static final String CALENDAREVENTS_FREE_BUSY = "calendar-events/free-busy";
     private static final String CALENDAR_EVENTS = "calendar-events";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
@@ -81,6 +81,7 @@ public class BeaconFetcher {
         return map;
     }
 
+    /*
     public String fetchRoomFreeBusyInfo(String address) {
         String data = null;
 
@@ -95,6 +96,7 @@ public class BeaconFetcher {
 
         return data;
     }
+    */
 
     public String fetchRoomEvents(String address) {
         String data = null;

@@ -1,13 +1,21 @@
+/*
+ * Copyright (c) 2015, Shaka LLC
+ * All rights reserved.
+ *
+ * Program:     CalendarEvent
+ * Purpose:     Calendar event object
+ * Created by:  John Hou
+ * Created on:  9/22/2015
+ */
 package com.shaka.akamia;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Created by JH on 9/22/15.
- */
 public class CalendarEvent {
 
 
@@ -118,8 +126,10 @@ public class CalendarEvent {
                     if (j == 0) {
                         sb.append(att.getEmail());
                         j++;
-                    } else
-                        sb.append(", " + att.getEmail());
+                    } else {
+                        sb.append(", ");
+                        sb.append(att.getEmail());
+                    }
                     i++;
                 }
             }
@@ -127,9 +137,32 @@ public class CalendarEvent {
 
         j = this.attendees.size() - i;
 
-        if ( j != 0)
-            sb.append(" + " + Integer.toString(j));
+        if ( j != 0) {
+            sb.append(" + ");
+            sb.append(Integer.toString(j));
+        }
 
         return sb.toString();
+    }
+
+    static public ArrayList<String> getTimeZoneList() {
+        ArrayList<String> arrayList = new ArrayList<>();
+
+        String [] ids = TimeZone.getAvailableIDs();
+
+        for(String id : ids) {
+            arrayList.add(displayTimeZone(TimeZone.getTimeZone(id)));
+        }
+
+        return arrayList;
+    }
+
+    static public String displayTimeZone(TimeZone tz) {
+        long hours = TimeUnit.MILLISECONDS.toHours(tz.getRawOffset());
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(tz.getRawOffset());
+
+        minutes = Math.abs(minutes);
+
+        return String.format("%s (GMT %d:%02d)", tz.getID(), hours, minutes);
     }
 }

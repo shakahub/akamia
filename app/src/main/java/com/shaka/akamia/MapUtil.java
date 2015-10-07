@@ -32,9 +32,10 @@ public class MapUtil {
     public MapUtil(Map src) {
         init();
 
+
         Iterator iter = src.entrySet().iterator();
 
-        while (iter.hasNext()) {
+        while(iter.hasNext()) {
             Map.Entry entry = (Map.Entry)iter.next();
             arrayList.add(entry);
         }

@@ -166,7 +166,7 @@ public class MainActivityFragment extends ListFragment {
                     break;
                 case NEW_FOUND:
                     //call webservice to verify the found device whether was registered or not
-                    final Map jsonMap = new BeaconFetchr().fetchBeacon(device.getAddress());
+                    final Map jsonMap = new BeaconFetcher().fetchBeacon(device.getAddress());
 
                     // adding to the UI have to happen in UI thread
                     getActivity().runOnUiThread(new Runnable() {

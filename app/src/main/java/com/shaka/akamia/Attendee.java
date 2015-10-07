@@ -1,8 +1,15 @@
+/*
+ * Copyright (c) 2015, Shaka LLC
+ * All rights reserved.
+ *
+ * Program:     Attendee
+ * Purpose:     Attendee object
+ * Created by:  John Hou
+ * Created on:  9/22/2015
+ */
 package com.shaka.akamia;
 
-/**
- * Created by JH on 9/22/15.
- */
+
 public class Attendee {
     String displayName;
     String email;

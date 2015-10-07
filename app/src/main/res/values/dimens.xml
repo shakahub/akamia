@@ -6,4 +6,5 @@
 
     <dimen name="navigation_bar_height">10dp</dimen>
     <dimen name="navigation_bar_width">0dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
 </resources>

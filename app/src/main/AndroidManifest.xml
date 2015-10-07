@@ -24,9 +24,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".RoomFreeBusyActivity"
+        <activity
+            android:name=".RoomFreeBusyActivity"
             android:label="@string/detail_name" />
+        <activity
+            android:name=".bookEventActivity"
+            android:label="@string/title_activity_book_event" >
+        </activity>
     </application>
 
 </manifest>

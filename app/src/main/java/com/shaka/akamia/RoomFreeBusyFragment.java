@@ -23,8 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.shaka.weekview.DateTimeInterpreter;
 import com.shaka.weekview.WeekView;
@@ -38,15 +38,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChangeListener,
-        WeekView.EventClickListener {
+        WeekView.EventClickListener, WeekView.EmptyViewLongPressListener {
 
     private static final String ARG_PARAM1 = "mac_address";
     private static final String ARG_PARAM2 = "room_name";
 
     private String mParam1;
     private String mParam2;
-    private String mRoomName;
-    private ArrayList<String> mArrayList;
     private ArrayList<CalendarEvent> mCalendarEventList;
 
     private static final int TYPE_DAY_VIEW = 1;
@@ -59,7 +57,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
 
 
     public interface Callbacks {
-
+        void onEmptyViewLongPress(Calendar time, String mac, String roomName);
     }
 
     /**
@@ -116,6 +114,10 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
         // month every time the month changes on the week view.
         mWeekView.setMonthChangeListener(this);
 
+        // Set long press lisenter for empty view
+        mWeekView.setEmptyViewLongPressListener(this);
+
+        // This is optional
         setupDateTimeInterpreter(false);
 
         return v;
@@ -136,10 +138,6 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
         setupDateTimeInterpreter(id == R.id.action_week_view);
 
         switch (id) {
-            case R.id.action_book_time:
-                Toast.makeText(getActivity(), "This service has not provided yet.", Toast.LENGTH_SHORT).show();
-                return true;
-
             case R.id.action_day_view:
                 if (mWeekViewType != TYPE_DAY_VIEW) {
                     item.setChecked(!item.isChecked());
@@ -288,6 +286,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                     events.add(event);
                 }
 
+                /*
                 ArrayList<Attendee> attendees = ce.getAttendees();
                 for(Attendee att : attendees) {
                     if (att.getDisplayName() != null) {
@@ -296,6 +295,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                         break;
                     }
                 }
+                */
             }
         }
 
@@ -339,11 +339,13 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                 event.getSummary());
     }
 
+    /*
     private String getEventTitle(Calendar s, Calendar e) {
         return String.format("%02d:%02d - %02d:%02d",
                 s.get(Calendar.HOUR_OF_DAY), s.get(Calendar.MINUTE),
                 e.get(Calendar.HOUR_OF_DAY), e.get(Calendar.MINUTE));
     }
+    */
 
     /**
      * Call Web Service to fetch google calendar information based on this specific room
@@ -351,14 +353,14 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     private class FetchSchedule extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void...params) {
-            //return new BeaconFetchr().fetchRoomFreeBusyInfo(mParam1);
-            return new BeaconFetchr().fetchRoomEvents(mParam1);
+            //return new BeaconFetcher().fetchRoomFreeBusyInfo(mParam1);
+            return new BeaconFetcher().fetchRoomEvents(mParam1);
         }
 
         @Override
         protected void onPostExecute(String info) {
-            //Map map = null;
-            LinkedList list = null;
+            //Map map;
+            LinkedList list;
 
             if (info != null && info.length() > 0) {
                 /* Following code lines for free-busy service */
@@ -383,7 +385,8 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
             if (Long.parseLong(ce.getEvent_id()) == event.getId()) {
                 final Dialog dialog = new Dialog(getActivity());
 
-                View v = getActivity().getLayoutInflater().inflate(R.layout.event_dialog, null);
+                View v = getActivity().getLayoutInflater().inflate(R.layout.event_dialog,
+                        new LinearLayout(getActivity().getBaseContext()));
 
                 dialog.setContentView(v);
                 dialog.setTitle(ce.getSummary());
@@ -392,7 +395,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                 textView1.setText(ce.getTimeTitle());
 
                 TextView textView2 = (TextView)dialog.findViewById(R.id.where_text);
-                textView2.setText(mRoomName);
+                textView2.setText(mParam2);
 
                 TextView textView3 = (TextView)dialog.findViewById(R.id.who_text);
 
@@ -411,5 +414,9 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                 break;
             }
         }
+    }
+
+    public void onEmptyViewLongPress(Calendar time) {
+        mCallbacks.onEmptyViewLongPress(time, mParam1, mParam2);
     }
 }

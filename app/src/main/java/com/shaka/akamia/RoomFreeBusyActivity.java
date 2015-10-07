@@ -9,7 +9,9 @@
  */
 package com.shaka.akamia;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
+import java.util.Calendar;
 
 public class RoomFreeBusyActivity extends SingleFragmentActivity
         implements RoomFreeBusyFragment.Callbacks {
@@ -21,5 +23,15 @@ public class RoomFreeBusyActivity extends SingleFragmentActivity
         String address = getIntent().getStringExtra(EXTRA_DEVICE_ADDRESS);
         String name = getIntent().getStringExtra(EXTRA_DEVICE_NAME);
         return RoomFreeBusyFragment.newInstance(address, name);
+    }
+
+    public void onEmptyViewLongPress(Calendar time, String macAddr, String roomName) {
+        Intent i = new Intent(this, bookEventActivity.class);
+
+        i.putExtra(bookEventActivity.EXTRA_START_TIME, time.getTimeInMillis());
+        i.putExtra(bookEventActivity.EXTRA_DEVICE_ADDRESS, macAddr);
+        i.putExtra(bookEventActivity.EXTRA_ROOM_NAME, roomName);
+
+        startActivity(i);
     }
 }
