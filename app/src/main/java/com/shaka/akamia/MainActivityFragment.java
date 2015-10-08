@@ -33,7 +33,6 @@ import com.shaka.beaconlibrary.BleWrapperUiCallbacks;
 import java.lang.Runnable;
 import java.util.Map;
 
-
 public class MainActivityFragment extends ListFragment {
 
     private static final long SCANNING_TIMEOUT = 30 * 1000; /* 30 seconds */
@@ -76,7 +75,7 @@ public class MainActivityFragment extends ListFragment {
         mBleWrapper = new BleWrapper(getActivity(), new BleWrapperUiCallbacks.Null() {
             @Override
             public void uiDeviceFound(final BluetoothDevice device, final int rssi, final byte[] record) {
-                handleFoundDevice(device, rssi, record);
+                handleFoundDevice(device, rssi);
             }
         });
 
@@ -147,8 +146,7 @@ public class MainActivityFragment extends ListFragment {
     }
 
     /* add or update device to the current list of devices */
-    private void handleFoundDevice(final BluetoothDevice device, final int rssi,
-                                   final byte[] scanRecord)
+    private void handleFoundDevice(final BluetoothDevice device, final int rssi)
     {
         if (device != null) {
             int result = mBeaconListAdapter.getRegStatus(device);

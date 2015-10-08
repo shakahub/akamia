@@ -9,12 +9,17 @@
  */
 package com.shaka.akamia;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +27,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -37,9 +41,11 @@ import com.shaka.weekview.WeekViewEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChangeListener,
         WeekView.EventClickListener, WeekView.EmptyViewLongPressListener {
@@ -50,6 +56,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     private String mParam1;
     private String mParam2;
     private ArrayList<CalendarEvent> mCalendarEventList;
+    private ArrayList<String> mUserAccounts;
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
@@ -59,9 +66,9 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
 
     Callbacks mCallbacks;
 
-
     public interface Callbacks {
         void onEmptyViewLongPress(Calendar time, String mac, String roomName);
+        void onEventEdit(CalendarEvent calendarEvent, String roomName, String account);
     }
 
     /**
@@ -97,9 +104,11 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
 
         getActivity().setTitle(mParam2);
 
+        mUserAccounts = getUserAccount();
+
         setRetainInstance(true);
 
-        new FetchSchedule().execute();
+        //new FetchSchedule().execute();
     }
 
     @Override
@@ -205,6 +214,12 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        new FetchSchedule().execute();
+    }
+
+    @Override
     public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
         // Populate the week view with some events.
         List<WeekViewEvent> events = new ArrayList<>();
@@ -260,6 +275,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
 
         //If calendar event list is available
         if (mCalendarEventList != null) {
+            int j = 0;
             for(CalendarEvent ce : mCalendarEventList) {
 
                 if ((ce.getStartDateTime().get(Calendar.YEAR) == newYear &&
@@ -270,7 +286,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                     WeekViewEvent event = new WeekViewEvent(Long.parseLong(ce.getEvent_id()),
                             getEventTitle(ce), ce.getStartDateTime(), ce.getEndDateTime());
 
-                    int i = mCalendarEventList.size()%4;
+                    int i = j%4;
 
                     switch (i) {
                         case 0:
@@ -288,6 +304,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                     }
 
                     events.add(event);
+                    j++;
                 }
 
                 /*
@@ -382,42 +399,89 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
         }
     }
 
-    @Override
-    public void onEventClick(WeekViewEvent event, RectF eventRect) {
-        for(CalendarEvent ce : mCalendarEventList) {
+    private ArrayList<String> getUserAccount() {
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS;
+        ArrayList<String> possibleEmailAddress = new ArrayList<>();
 
-            if (Long.parseLong(ce.getEvent_id()) == event.getId()) {
-                final Dialog dialog = new Dialog(getActivity());
-
-                View v = getActivity().getLayoutInflater().inflate(R.layout.event_dialog,
-                        new LinearLayout(getActivity().getBaseContext()));
-
-                dialog.setContentView(v);
-                dialog.setTitle(ce.getSummary());
-
-                TextView textView1 = (TextView)dialog.findViewById(R.id.title);
-                textView1.setText(ce.getTimeTitle());
-
-                TextView textView2 = (TextView)dialog.findViewById(R.id.where_text);
-                textView2.setText(mParam2);
-
-                TextView textView3 = (TextView)dialog.findViewById(R.id.who_text);
-
-                textView3.setText(ce.getAttendeesShortString());
-
-                Button dialogButton = (Button)dialog.findViewById(R.id.dialogButtonOK);
-
-                dialogButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.show();
-                break;
+        Account[] accounts = AccountManager.get(getActivity()).getAccounts();
+        for(Account acc : accounts) {
+            if (emailPattern.matcher(acc.name).matches()) {
+                if (! possibleEmailAddress.contains(acc.name.toLowerCase())) {
+                    possibleEmailAddress.add(acc.name.toLowerCase());
+                }
             }
         }
+
+        return possibleEmailAddress;
+    }
+
+    @Override
+    public void onEventClick(WeekViewEvent event, RectF eventRect) {
+
+        final CalendarEvent ce = getClickedCalendarEvent(event.getId());
+
+        if (ce == null)
+            return;
+
+        final Dialog dialog = new Dialog(getActivity());
+
+        View v = getActivity().getLayoutInflater().inflate(R.layout.event_dialog,
+                new LinearLayout(getActivity()));
+
+        dialog.setContentView(v);
+        dialog.setTitle(ce.getSummary());
+
+        //Display Event Title
+        TextView textView1 = (TextView)dialog.findViewById(R.id.title);
+        textView1.setText(ce.getTimeTitle());
+
+        //Display where
+        TextView textView2 = (TextView)dialog.findViewById(R.id.where_text);
+        textView2.setText(mParam2);
+
+        //Display who will attend
+        TextView textView3 = (TextView)dialog.findViewById(R.id.who_text);
+
+        textView3.setText(ce.getAttendeesShortString());
+
+
+        //Display linked action
+        final TextView textView4 = (TextView)dialog.findViewById(R.id.actionLink);
+
+        HashMap<String, Object> hm = ce.isOrganizer(mUserAccounts);
+        final MapUtil mu = new MapUtil(hm);
+
+        if (hm.size() == 0) {
+            textView4.setText(Html.fromHtml(getActivity().getString(R.string.link_close)));
+        } else {
+            if ((Boolean)mu.getValueByKey("result"))
+                textView4.setText(Html.fromHtml(getActivity().getString(R.string.link_edit)));
+        }
+
+        textView4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (textView4.getText().toString().equals(
+                        Html.fromHtml(getActivity().getString(R.string.link_edit)).toString())) {
+                    mCallbacks.onEventEdit(ce, mParam2, (String)mu.getValueByKey("email"));
+                }
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    @Nullable
+    private CalendarEvent getClickedCalendarEvent(long eventId) {
+        for(CalendarEvent calendarEvent : mCalendarEventList) {
+            if (Long.parseLong(calendarEvent.getEvent_id()) == eventId) {
+                return calendarEvent;
+            }
+        }
+
+        return null;
     }
 
     public void onEmptyViewLongPress(Calendar time) {

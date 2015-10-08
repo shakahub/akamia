@@ -9,14 +9,22 @@
  */
 package com.shaka.akamia.objects;
 
+import android.support.annotation.NonNull;
+import android.util.ArrayMap;
+
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-public class CalendarEvent {
+public class CalendarEvent implements Serializable {
 
     public CalendarEvent() {
     }
@@ -28,8 +36,6 @@ public class CalendarEvent {
     public void setEvent_id(String event_id) {
         this.event_id = event_id;
     }
-
-    String event_id;
 
     public String getSummary() {
         return summary;
@@ -87,6 +93,7 @@ public class CalendarEvent {
         this.attendees = attendees;
     }
 
+    String event_id;
     String summary;
     String description;
     String location;
@@ -142,6 +149,21 @@ public class CalendarEvent {
         }
 
         return sb.toString();
+    }
+
+    public HashMap<String, Object> isOrganizer(ArrayList<String> arrayList) {
+        HashMap<String, Object> hm = new HashMap<>();
+
+        for(Attendee att : this.attendees) {
+            String email = att.getEmail().toLowerCase();
+            if (arrayList.contains(email) && att.isOrganizer()) {
+                hm.put("result", true);
+                hm.put("email", email);
+                break;
+            }
+        }
+
+        return hm;
     }
 
     static public ArrayList<String> getTimeZoneList() {

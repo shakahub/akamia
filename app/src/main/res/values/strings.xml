@@ -18,12 +18,15 @@
 
     <string name="book_time">Book Time</string>
     <string name="title_activity_book_event">Book Event</string>
+    <string name="title_activity_edit_event">Edit Event</string>
 
     <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
     <string name="action_save">Save</string>
 
     <string name="event_title">Untitled event</string>
-    <string name="timezonedialog_title">Select TimeZone</string>
+    <string name="timezone_dialog_title">Select TimeZone</string>
+    <string name="prompt">Choose an account</string>
 
     <string name="txt_from">From</string>
     <string name="txt_to">To</string>
@@ -31,7 +34,10 @@
     <string name="txt_who">Who</string>
     <string name="txt_timezone">Time\nZone</string>
     <string name="txt_location">Location</string>
+    <string name="txt_account">Account</string>
     <string name="txt_title">Title</string>
     <string name="rssi">RSSI:</string>
-    <string name="ok">OK</string>
+
+    <string name="link_close">&lt;u>Close&lt;/u></string>
+    <string name="link_edit">&lt;u>Edit &#62;&#62;&lt;/u></string>
 </resources>

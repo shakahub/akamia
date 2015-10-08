@@ -11,6 +11,9 @@ package com.shaka.akamia;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+
+import com.shaka.akamia.objects.CalendarEvent;
+
 import java.util.Calendar;
 
 public class RoomFreeBusyActivity extends SingleFragmentActivity
@@ -31,6 +34,16 @@ public class RoomFreeBusyActivity extends SingleFragmentActivity
         i.putExtra(BookEventActivity.EXTRA_START_TIME, time.getTimeInMillis());
         i.putExtra(BookEventActivity.EXTRA_DEVICE_ADDRESS, macAddr);
         i.putExtra(BookEventActivity.EXTRA_ROOM_NAME, roomName);
+
+        startActivity(i);
+    }
+
+    public void onEventEdit(CalendarEvent ce, String roomName, String account) {
+        Intent i = new Intent(this, EditEventActivity.class);
+
+        i.putExtra(EditEventActivity.EXTRA_CALENDAR_EVENT, ce);
+        i.putExtra(EditEventActivity.EXTRA_ROOM_NAME, roomName);
+        i.putExtra(EditEventActivity.EXTRA_USER_ACCOUNT, account);
 
         startActivity(i);
     }

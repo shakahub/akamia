@@ -10,7 +10,9 @@
 package com.shaka.akamia.objects;
 
 
-public class Attendee {
+import java.io.Serializable;
+
+public class Attendee implements Serializable {
     String displayName;
     String email;
     String responseStatus;
@@ -46,7 +48,7 @@ public class Attendee {
     }
 
     public boolean isResource() {
-        return self;
+        return resource;
     }
 
     public void setResource(boolean resource) {

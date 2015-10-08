@@ -6,7 +6,10 @@
         android:id="@+id/title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
@@ -34,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
         android:text="@string/txt_who"
         android:textStyle="bold"
         android:layout_below="@+id/where"
@@ -46,14 +50,20 @@
         android:layout_alignBaseline="@+id/who"
         android:layout_toEndOf="@+id/who" />
 
-    <Button
-        android:id="@+id/dialogButtonOK"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="@string/ok"
-        android:layout_marginStart="5dp"
+    <View style="@style/Divider"
+        android:id="@+id/divider"
+        android:layout_marginBottom="5dp"
         android:layout_below="@+id/who"
-        android:layout_alignEnd="@+id/who_text"
-        android:layout_marginEnd="22dp" />
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/actionLink"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="#0000FF"
+        android:layout_alignEnd="@+id/divider"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@+id/divider" />
 
 </RelativeLayout>

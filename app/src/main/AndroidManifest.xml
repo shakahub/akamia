@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -30,6 +31,10 @@
         <activity
             android:name=".BookEventActivity"
             android:label="@string/title_activity_book_event" >
+        </activity>
+        <activity
+            android:name=".EditEventActivity"
+            android:label="@string/title_activity_edit_event" >
         </activity>
     </application>
 

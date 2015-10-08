@@ -2,26 +2,19 @@
  * Copyright (c) 2015, Shaka LLC
  * All rights reserved.
  *
- * Program:     BookEventActivity
- * Purpose:     Book an event
+ * Program:     EditEventActivity
+ * Purpose:     book an event
  * Created by:  John Hou
- * Created on:  10/6/2015
+ * Created on:  10/8/2015
  */
 package com.shaka.akamia;
 
-import com.shaka.akamia.objects.CalendarEvent;
-import com.shaka.akamia.util.BeaconFetcher;
-
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.util.Patterns;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,30 +25,30 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.shaka.akamia.objects.CalendarEvent;
+import com.shaka.akamia.util.BeaconFetcher;
+
 import org.json.simple.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
-public class BookEventActivity extends AppCompatActivity {
-    public static final String EXTRA_START_TIME = "startTime";
-    public static final String EXTRA_DEVICE_ADDRESS = "macAddress";
-    public static final String EXTRA_ROOM_NAME = "meetingRoomName";
+public class EditEventActivity extends AppCompatActivity {
+    public static final String EXTRA_CALENDAR_EVENT = "myCalendarEvent";
+    public static final String EXTRA_ROOM_NAME = "myRoomName";
+    public static final String EXTRA_USER_ACCOUNT = "myEmailAccount";
 
     final Context context = this;
 
-    String mAddress;
+    CalendarEvent mCalendarEvent;
     String mName;
-    Long   mTime;
+    String mEmailAccount;
 
     EditText mEditText;
     Button mFromDateButton;
@@ -63,7 +56,6 @@ public class BookEventActivity extends AppCompatActivity {
     Button mToDateButton;
     Button mToTimeButton;
     Button mTimeZoneButton;
-    Spinner mAccountSpinner;
 
     Calendar fCalendar = Calendar.getInstance();
     Calendar tCalendar = Calendar.getInstance();
@@ -71,24 +63,17 @@ public class BookEventActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_event);
+        setContentView(R.layout.activity_edit_event);
 
-        mAddress = getIntent().getStringExtra(EXTRA_DEVICE_ADDRESS);
+        mCalendarEvent = (CalendarEvent)getIntent().getSerializableExtra(EXTRA_CALENDAR_EVENT);
         mName = getIntent().getStringExtra(EXTRA_ROOM_NAME);
-        mTime = getIntent().getLongExtra(EXTRA_START_TIME, 0);
+        mEmailAccount = getIntent().getStringExtra(EXTRA_USER_ACCOUNT);
 
-        fCalendar.setTimeInMillis(mTime);
+        fCalendar = mCalendarEvent.getStartDateTime();
 
         //Event title
         mEditText = (EditText)findViewById(R.id.editText1);
-        mEditText.setText(context.getString(R.string.event_title));
-        mEditText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mEditText.getText().toString().equals("Untitled event"))
-                    mEditText.setText("");
-            }
-        });
+        mEditText.setText(mCalendarEvent.getSummary());
 
         //from date string
         SimpleDateFormat weekdayNameFormat= new SimpleDateFormat("EEE", Locale.getDefault());
@@ -154,7 +139,7 @@ public class BookEventActivity extends AppCompatActivity {
         });
 
         //to date string
-        tCalendar.setTimeInMillis(mTime + 3600000);
+        tCalendar = mCalendarEvent.getEndDateTime();
 
         String to_date = String.format("%s, %02d/%02d/%04d", weekday,
                 tCalendar.get(Calendar.DAY_OF_MONTH), tCalendar.get(Calendar.MONTH) + 1,
@@ -258,42 +243,15 @@ public class BookEventActivity extends AppCompatActivity {
         TextView textView = (TextView)findViewById(R.id.location);
         textView.setText(mName);
 
-        //Account Spinner
-        Pattern emailPattern = Patterns.EMAIL_ADDRESS;
-        ArrayList<String> possibleEmailAddress = new ArrayList<>();
-
-        Account[] accounts = AccountManager.get(context).getAccounts();
-        for(Account acc : accounts) {
-            if (emailPattern.matcher(acc.name).matches()) {
-                if (! possibleEmailAddress.contains(acc.name.toLowerCase())) {
-                    possibleEmailAddress.add(acc.name.toLowerCase());
-                }
-            }
-        }
-
-        ArrayAdapter<String> accountAdapter = new ArrayAdapter<>(context,
-                android.R.layout.simple_list_item_1, possibleEmailAddress);
-        accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        mAccountSpinner = (Spinner)findViewById(R.id.account_spinner);
-        mAccountSpinner.setAdapter(accountAdapter);
-        mAccountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mAccountSpinner.setSelection(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        //Account
+        TextView textView1 = (TextView)findViewById(R.id.account);
+        textView1.setText(mEmailAccount);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_book_event, menu);
+        getMenuInflater().inflate(R.menu.menu_edit_event, menu);
         return true;
     }
 
@@ -303,6 +261,10 @@ public class BookEventActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_save:
                 saveBookingEvent();
+                finish();
+                break;
+            case R.id.action_delete:
+                delEvent(mCalendarEvent.getEvent_id());
                 finish();
                 break;
             case R.id.action_cancel:
@@ -326,13 +288,26 @@ public class BookEventActivity extends AppCompatActivity {
         jsonData.put("timezone", mTimeZoneButton.getText());
 
         jsonEvent.put("room_name", mName);
-        jsonEvent.put("account", mAccountSpinner.getSelectedItem().toString());
+        jsonEvent.put("account", mEmailAccount);
         jsonEvent.put("event", jsonData);
 
         String result = BeaconFetcher.postBookEvent(jsonEvent);
 
         if (result.equals("success")) {
-            Toast.makeText(context, "The event has successfully booked", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "The event has successfully saved", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void delEvent(String eventId) {
+        JSONObject jsonEvent = new JSONObject();
+
+        jsonEvent.put("event_id", eventId);
+
+        String result = BeaconFetcher.postDeleteEvent(jsonEvent);
+
+        if (result.equals("success")) {
+            Toast.makeText(context, "The event has been deleted", Toast.LENGTH_LONG).show();
         }
     }
 }
