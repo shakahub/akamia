@@ -167,38 +167,31 @@ public class MapUtil {
                     //Set current timezone to UTC because the time from server is in UTC timezone
                     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
                     Calendar startDate = Calendar.getInstance();
-                    LinkedHashMap lh = (LinkedHashMap) entry.getValue();
+                    LinkedList list = (LinkedList)entry.getValue();
 
-                    for(Object o : lh.entrySet()) {
-                        Map.Entry entry2 = (Map.Entry)o;
-                        if (entry2.getKey().equals("year")) {
-                            startDate.set(Calendar.YEAR, Integer.parseInt(entry2.getValue().toString()));
+                    for(int j=0; j < list.size(); j++) {
+                        if (j == 0) {
+                            startDate.set(Calendar.YEAR, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("monthValue")) {
-                            //Note here subtract 1 since it should start from 0
-                            startDate.set(Calendar.MONTH, Integer.parseInt(entry2.getValue().toString())-1);
+                        if (j == 1) {
+                            startDate.set(Calendar.MONTH, Integer.parseInt(list.get(j).toString()) - 1);
                             continue;
                         }
-
-                        if (entry2.getKey().equals("dayOfMonth")) {
-                            startDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 2) {
+                            startDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("hour")) {
-                            startDate.set(Calendar.HOUR_OF_DAY, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 3) {
+                            startDate.set(Calendar.HOUR_OF_DAY, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("minute")) {
-                            startDate.set(Calendar.MINUTE, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 4) {
+                            startDate.set(Calendar.MINUTE, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("second"))
-                            startDate.set(Calendar.SECOND, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 5)
+                            startDate.set(Calendar.SECOND, Integer.parseInt(list.get(j).toString()));
                     }
 
                     //get local timezone back
@@ -218,38 +211,31 @@ public class MapUtil {
                     //Set current timezone to UTC because the time from server is in UTC timezone
                     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
                     Calendar endDate = Calendar.getInstance();
-                    LinkedHashMap lh = (LinkedHashMap) entry.getValue();
+                    LinkedList list = (LinkedList)entry.getValue();
 
-                    for (Object o : lh.entrySet()) {
-                        Map.Entry entry2 = (Map.Entry)o;
-                        if (entry2.getKey().equals("year")) {
-                            endDate.set(Calendar.YEAR, Integer.parseInt(entry2.getValue().toString()));
+                    for(int j=0; j < list.size(); j++) {
+                        if (j == 0) {
+                            endDate.set(Calendar.YEAR, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("monthValue")) {
-                            //Note here subtract 1 since it should start from 0
-                            endDate.set(Calendar.MONTH, Integer.parseInt(entry2.getValue().toString())-1);
+                        if (j == 1) {
+                            endDate.set(Calendar.MONTH, Integer.parseInt(list.get(j).toString()) - 1);
                             continue;
                         }
-
-                        if (entry2.getKey().equals("dayOfMonth")) {
-                            endDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 2) {
+                            endDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("hour")) {
-                            endDate.set(Calendar.HOUR_OF_DAY, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 3) {
+                            endDate.set(Calendar.HOUR_OF_DAY, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("minute")) {
-                            endDate.set(Calendar.MINUTE, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 4) {
+                            endDate.set(Calendar.MINUTE, Integer.parseInt(list.get(j).toString()));
                             continue;
                         }
-
-                        if (entry2.getKey().equals("second"))
-                            endDate.set(Calendar.SECOND, Integer.parseInt(entry2.getValue().toString()));
+                        if (j == 5)
+                            endDate.set(Calendar.SECOND, Integer.parseInt(list.get(j).toString()));
                     }
 
                     //get local timezone back

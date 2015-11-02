@@ -12,6 +12,7 @@
     <string name="title_stop">Stop</string>
     <string name="title_log">Log</string>
 
+    <string name="action_refresh_view">Refresh</string>
     <string name="action_day_view">Day view</string>
     <string name="action_three_day_view">3-day view</string>
     <string name="action_week_view">Week view</string>
@@ -38,6 +39,10 @@
     <string name="txt_title">Title</string>
     <string name="rssi">RSSI:</string>
 
+    <string name="separate">|</string>
+    <string name="link_accept">&lt;u>Accept&lt;/u></string>
+    <string name="link_delete">&lt;u>Delete&lt;/u></string>
+    <string name="link_refuse">&lt;u>Refuse&lt;/u></string>
     <string name="link_close">&lt;u>Close&lt;/u></string>
     <string name="link_edit">&lt;u>Edit &#62;&#62;&lt;/u></string>
 </resources>

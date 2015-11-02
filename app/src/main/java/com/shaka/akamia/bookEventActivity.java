@@ -18,6 +18,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -37,7 +38,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,12 +51,12 @@ import java.util.regex.Pattern;
 
 public class BookEventActivity extends AppCompatActivity {
     public static final String EXTRA_START_TIME = "startTime";
-    public static final String EXTRA_DEVICE_ADDRESS = "macAddress";
     public static final String EXTRA_ROOM_NAME = "meetingRoomName";
+    public static final String EXTRA_ROOM_EMAIL = "meetingRoomEmail";
 
     final Context context = this;
 
-    String mAddress;
+    String mEmail;
     String mName;
     Long   mTime;
 
@@ -65,6 +68,8 @@ public class BookEventActivity extends AppCompatActivity {
     Button mTimeZoneButton;
     Spinner mAccountSpinner;
 
+    JSONObject mjsonEvent = new JSONObject();
+
     Calendar fCalendar = Calendar.getInstance();
     Calendar tCalendar = Calendar.getInstance();
 
@@ -73,7 +78,7 @@ public class BookEventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_event);
 
-        mAddress = getIntent().getStringExtra(EXTRA_DEVICE_ADDRESS);
+        mEmail = getIntent().getStringExtra(EXTRA_ROOM_EMAIL);
         mName = getIntent().getStringExtra(EXTRA_ROOM_NAME);
         mTime = getIntent().getLongExtra(EXTRA_START_TIME, 0);
 
@@ -315,24 +320,113 @@ public class BookEventActivity extends AppCompatActivity {
 
     @SuppressWarnings("unchecked")
     private void saveBookingEvent() {
-        JSONObject jsonEvent = new JSONObject();
+        final String SUMMARY = "summary";
+        final String RECURRENCE = "recurrence";
+        final String LOCATION = "location";
+        final String DESCRIPTION = "description";
+        final String STARTDATETIME = "startDateTime";
+        final String ENDDATETIME = "endDateTime";
+        final String EMAIL = "email";
+        final String EVENTATTENDEES = "eventAttendees";
+        final String ID = "id";
+        final String ADMIN = "admin@weshaka.com";
+        final String CREATOR = "creator";
+        final String CALENDAREVENT = "calendarEvent";
+        final String ACCEPTED = "accepted";
+        final String RESPONSESTATUS = "responseStatus";
+        final String SELF = "self";
+        final String RESOURCE = "resource";
+        final String ORGANIZER = "organizer";
+        final String DISPLAYNAME = "displayName";
+
         JSONObject jsonData = new JSONObject();
+        JSONObject jsonData2 = new JSONObject();
+        JSONArray list = new JSONArray();
 
-        jsonData.put("title", mEditText.getText());
-        jsonData.put("from_date", mFromDateButton.getText());
-        jsonData.put("from_time", mFromTimeButton.getText());
-        jsonData.put("to_date", mToDateButton.getText());
-        jsonData.put("to_time", mToTimeButton.getText());
-        jsonData.put("timezone", mTimeZoneButton.getText());
+        try {
 
-        jsonEvent.put("room_name", mName);
-        jsonEvent.put("account", mAccountSpinner.getSelectedItem().toString());
-        jsonEvent.put("event", jsonData);
+            jsonData.put(SUMMARY, mEditText.getText().toString());
+            jsonData.put(LOCATION, mName);
+            jsonData.put(DESCRIPTION, mEditText.getText().toString());
 
-        String result = BeaconFetcher.postBookEvent(jsonEvent);
+            list.put(fCalendar.get(Calendar.YEAR));
+            list.put(fCalendar.get(Calendar.MONTH)+1);
+            list.put(fCalendar.get(Calendar.DAY_OF_MONTH));
+            list.put(fCalendar.get(Calendar.HOUR_OF_DAY));
+            list.put(fCalendar.get(Calendar.MINUTE));
+            list.put(fCalendar.get(Calendar.SECOND));
+            list.put(0);
 
-        if (result.equals("success")) {
-            Toast.makeText(context, "The event has successfully booked", Toast.LENGTH_LONG).show();
+            jsonData.put(STARTDATETIME, list);
+
+            list = new JSONArray();
+
+            list.put(tCalendar.get(Calendar.YEAR));
+            list.put(tCalendar.get(Calendar.MONTH)+1);
+            list.put(tCalendar.get(Calendar.DAY_OF_MONTH));
+            list.put(tCalendar.get(Calendar.HOUR_OF_DAY));
+            list.put(tCalendar.get(Calendar.MINUTE));
+            list.put(tCalendar.get(Calendar.SECOND));
+            list.put(0);
+
+            jsonData.put(ENDDATETIME, list);
+
+            list = new JSONArray();
+
+            jsonData2.put(DISPLAYNAME, mName);
+            jsonData2.put(EMAIL, mEmail);
+            jsonData2.put(RESOURCE, true);
+            jsonData2.put(RESPONSESTATUS, ACCEPTED);
+            jsonData2.put(SELF, true);
+
+            list.put(jsonData2);
+
+            jsonData2 = new JSONObject();
+            jsonData2.put(EMAIL, mAccountSpinner.getSelectedItem().toString());
+            jsonData2.put(ORGANIZER, true);
+            jsonData2.put(RESPONSESTATUS, ACCEPTED);
+            list.put(jsonData2);
+
+            jsonData2 = new JSONObject();
+            jsonData2.put(EMAIL, ADMIN);
+            jsonData2.put(ORGANIZER, false);
+            list.put(jsonData2);
+
+            jsonData.put(EVENTATTENDEES, list);
+
+            jsonData2 = new JSONObject();
+            jsonData2.put(EMAIL, mAccountSpinner.getSelectedItem().toString());
+            jsonData2.put(ID, ADMIN);
+
+            jsonData.put(CREATOR, jsonData2);
+
+            list = new JSONArray();
+            list.put("RRULE:FREQ=DAILY;COUNT=1");  //hard code right now
+            jsonData.put(RECURRENCE, list);
+
+            mjsonEvent.put(CALENDAREVENT, jsonData);
+
+            //post the new event to server
+            new PostEventToServer().execute();
+        } catch (JSONException je) {
+            je.printStackTrace();
+        }
+    }
+
+    /**
+     * Call Web Service to fetch google calendar information based on this specific room
+     */
+    private class PostEventToServer extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void...params) {
+            return new BeaconFetcher().postBookEvent(mjsonEvent.toString());
+        }
+
+        @Override
+        protected void onPostExecute(String info) {
+            if (! info.equals("200")) {
+                Toast.makeText(context, "Sorry, book event was failed", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

@@ -3,11 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MyActivity">
 
+    <item android:id="@+id/action_fresh_view"
+        android:title="@string/action_refresh_view"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom" />
+
     <group android:checkableBehavior="single">
         <item android:id="@+id/action_day_view"
             android:title="@string/action_day_view"
-            android:orderInCategory="100"
-            app:showAsAction="ifRoom" />
+            android:orderInCategory="100" />
         <item android:id="@+id/action_three_day_view"
             android:title="@string/action_three_day_view"
             android:orderInCategory="100"

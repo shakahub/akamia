@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.shaka.akamia.objects.Attendee;
 import com.shaka.akamia.objects.CalendarEvent;
 import com.shaka.akamia.util.BeaconFetcher;
 import com.shaka.akamia.util.MapUtil;
@@ -57,6 +58,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     private String mParam2;
     private ArrayList<CalendarEvent> mCalendarEventList;
     private ArrayList<String> mUserAccounts;
+    private Boolean mPause;
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
@@ -67,7 +69,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     Callbacks mCallbacks;
 
     public interface Callbacks {
-        void onEmptyViewLongPress(Calendar time, String mac, String roomName);
+        void onEmptyViewLongPress(Calendar time, String roomName, String roomEmail);
         void onEventEdit(CalendarEvent calendarEvent, String roomName, String account);
     }
 
@@ -103,12 +105,10 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
         }
 
         getActivity().setTitle(mParam2);
-
         mUserAccounts = getUserAccount();
+        mPause = false;
 
         setRetainInstance(true);
-
-        //new FetchSchedule().execute();
     }
 
     @Override
@@ -151,6 +151,9 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
         setupDateTimeInterpreter(id == R.id.action_week_view);
 
         switch (id) {
+            case R.id.action_fresh_view:
+                new FetchSchedule().execute(false);
+                break;
             case R.id.action_day_view:
                 if (mWeekViewType != TYPE_DAY_VIEW) {
                     item.setChecked(!item.isChecked());
@@ -216,62 +219,14 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     @Override
     public void onResume() {
         super.onResume();
-        new FetchSchedule().execute();
+        new FetchSchedule().execute(mPause);
+        mPause = true;
     }
 
     @Override
     public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
         // Populate the week view with some events.
         List<WeekViewEvent> events = new ArrayList<>();
-
-        /*
-        //If free-busy list is available
-        if (mArrayList != null) {
-            long id = 1;
-            for(String s : mArrayList) {
-                Map map = new ParseToMap().parse2(s);
-
-                MapUtil mu = new MapUtil(map);
-
-                Calendar startTime = Calendar.getInstance();
-                long lstart = Long.parseLong(mu.getValueByKey("start").toString());
-                startTime.setTimeInMillis(lstart);
-
-                Calendar endTime = Calendar.getInstance();
-                long lend = Long.parseLong(mu.getValueByKey("end").toString());
-                endTime.setTimeInMillis(lend);
-
-                if ((startTime.get(Calendar.YEAR) == newYear &&
-                        startTime.get(Calendar.MONTH) == newMonth) ||
-                        (endTime.get(Calendar.YEAR) == newYear &&
-                                endTime.get(Calendar.MONTH) == newMonth)) {
-                    WeekViewEvent event =
-                            new WeekViewEvent(id, getEventTitle(startTime, endTime),
-                                    startTime, endTime);
-
-                    int i = events.size()%4;
-
-                    switch (i) {
-                        case 0:
-                            event.setColor(getResources().getColor(R.color.event_color_01));
-                            break;
-                        case 1:
-                            event.setColor(getResources().getColor(R.color.event_color_02));
-                            break;
-                        case 2:
-                            event.setColor(getResources().getColor(R.color.event_color_03));
-                            break;
-                        case 3:
-                            event.setColor(getResources().getColor(R.color.event_color_04));
-                            break;
-                    }
-
-                    events.add(event);
-                    id ++;
-                }
-            }
-        }
-        */
 
         //If calendar event list is available
         if (mCalendarEventList != null) {
@@ -306,17 +261,6 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                     events.add(event);
                     j++;
                 }
-
-                /*
-                ArrayList<Attendee> attendees = ce.getAttendees();
-                for(Attendee att : attendees) {
-                    if (att.getDisplayName() != null) {
-                        mRoomName = att.getDisplayName();
-                        getActivity().setTitle(mParam2 + " - " + mRoomName);
-                        break;
-                    }
-                }
-                */
             }
         }
 
@@ -332,7 +276,7 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
         mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
             @Override
             public String interpretDate(Calendar date) {
-                SimpleDateFormat weekdayNameFormat= new SimpleDateFormat("EEE",Locale.getDefault());
+                SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
                 String weekday = weekdayNameFormat.format(date.getTime());
                 SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
 
@@ -360,37 +304,26 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
                 event.getSummary());
     }
 
-    /*
-    private String getEventTitle(Calendar s, Calendar e) {
-        return String.format("%02d:%02d - %02d:%02d",
-                s.get(Calendar.HOUR_OF_DAY), s.get(Calendar.MINUTE),
-                e.get(Calendar.HOUR_OF_DAY), e.get(Calendar.MINUTE));
-    }
-    */
-
     /**
      * Call Web Service to fetch google calendar information based on this specific room
      */
-    private class FetchSchedule extends AsyncTask<Void, Void, String> {
+    private class FetchSchedule extends AsyncTask<Boolean, Void, String> {
         @Override
-        protected String doInBackground(Void...params) {
-            //return new BeaconFetcher().fetchRoomFreeBusyInfo(mParam1);
-            return new BeaconFetcher().fetchRoomEvents(mParam1);
+        protected String doInBackground(Boolean...pauses) {
+            try {
+                if (pauses[0])
+                    Thread.sleep(1000); //wait for a while to let server finish its job first
+                return new BeaconFetcher().fetchRoomEvents(mParam1);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+            return null;
         }
 
         @Override
         protected void onPostExecute(String info) {
-            //Map map;
-            LinkedList list;
-
             if (info != null && info.length() > 0) {
-                /* Following code lines for free-busy service */
-                //map = new ParseToMap().parse(info);
-                //MapUtil mu = new MapUtil();
-                //mu.convertToFreeBusyList(map);
-                //mArrayList = mu.getFreeBusyList();
-
-                list = new ParseToMap().parseToList(info);
+                LinkedList list = new ParseToMap().parseToList(info);
                 MapUtil mu = new MapUtil();
 
                 mCalendarEventList = mu.convertToCalendarEventList(list);
@@ -444,7 +377,6 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
 
         textView3.setText(ce.getAttendeesShortString());
 
-
         //Display linked action
         final TextView textView4 = (TextView)dialog.findViewById(R.id.actionLink);
 
@@ -469,6 +401,42 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
             }
         });
 
+        //Separate
+        TextView textView5 = (TextView)dialog.findViewById(R.id.separate);
+
+        //Accept
+        TextView textView6 = (TextView)dialog.findViewById(R.id.accept);
+
+        //Refuse
+        TextView textView7 = (TextView)dialog.findViewById(R.id.refuse);
+
+        if (ce.isNeedsAction(mUserAccounts)) {
+            textView5.setVisibility(View.VISIBLE);
+            textView6.setVisibility(View.VISIBLE);
+            textView7.setVisibility(View.VISIBLE);
+
+            textView6.setText(Html.fromHtml(getActivity().getString(R.string.link_accept)));
+            textView7.setText(Html.fromHtml(getActivity().getString(R.string.link_refuse)));
+
+            textView6.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+            textView7.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+        } else {
+            textView5.setVisibility(View.INVISIBLE);
+            textView6.setVisibility(View.INVISIBLE);
+            textView7.setVisibility(View.INVISIBLE);
+        }
+
         dialog.show();
 
     }
@@ -485,6 +453,16 @@ public class RoomFreeBusyFragment extends Fragment implements WeekView.MonthChan
     }
 
     public void onEmptyViewLongPress(Calendar time) {
-        mCallbacks.onEmptyViewLongPress(time, mParam1, mParam2);
+        String email = "";
+
+        ArrayList<Attendee> attendees = mCalendarEventList.get(0).getAttendees();
+        for (Attendee attendee : attendees) {
+            if (attendee.getDisplayName().equals(mParam2)) {
+                email = attendee.getEmail();
+                break;
+            }
+        }
+
+        mCallbacks.onEmptyViewLongPress(time, mParam2, email);
     }
 }

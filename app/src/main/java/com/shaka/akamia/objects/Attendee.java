@@ -24,7 +24,7 @@ public class Attendee implements Serializable {
     }
 
     public String getDisplayName() {
-        return displayName;
+        return (displayName == null? "" : displayName);
     }
 
     public void setDisplayName(String displayName) {
@@ -32,7 +32,7 @@ public class Attendee implements Serializable {
     }
 
     public String getEmail() {
-        return email;
+        return (email == null? "" : email);
     }
 
     public void setEmail(String email) {
@@ -40,7 +40,7 @@ public class Attendee implements Serializable {
     }
 
     public String getResponseStatus() {
-        return responseStatus;
+        return (responseStatus == null? "" : responseStatus);
     }
 
     public void setResponseStatus(String responseStatus) {

@@ -9,18 +9,12 @@
  */
 package com.shaka.akamia.objects;
 
-import android.support.annotation.NonNull;
-import android.util.ArrayMap;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -124,11 +118,11 @@ public class CalendarEvent implements Serializable {
             if (i >= 5)
                 break;
 
-            if (att.getDisplayName() != null) {
+            if (att.getDisplayName() != null && ! att.getDisplayName().equals("")) {
                 sb.insert(0, att.getDisplayName() + ", ");
                 i++;
             } else {
-                if (att.getEmail() != null) {
+                if (att.getEmail() != null && ! att.getEmail().equals("")) {
                     if (j == 0) {
                         sb.append(att.getEmail());
                         j++;
@@ -164,6 +158,32 @@ public class CalendarEvent implements Serializable {
         }
 
         return hm;
+    }
+
+    public HashMap<String, Object> isCreator(ArrayList<String> arrayList) {
+        HashMap<String, Object> hm = new HashMap<>();
+
+        for(String user : arrayList) {
+            if (user.equals(this.creator)) {
+                hm.put("result", true);
+                hm.put("email", user);
+                break;
+            }
+        }
+
+        return hm;
+    }
+
+    public boolean isNeedsAction(ArrayList<String> arrayList) {
+
+        for(Attendee att : this.attendees) {
+            String email = att.getEmail().toLowerCase();
+            if (arrayList.contains(email) && att.getResponseStatus().equals("needsAction")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     static public ArrayList<String> getTimeZoneList() {
